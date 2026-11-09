@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protege Task Roster System</title>
+    <!-- Load Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        
+        /* Print-specific styling to hide UI elements and format the table perfectly for paper */
+        @media print {
+            body {
+                background-color: #ffffff;
+                margin: 0;
+                padding: 0;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-area-wrapper {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            
+            /* Grid Print Enforcements for Calendar */
+            .grid {
+                display: grid !important;
+            }
+            #calendar-container {
+                border: 2px solid #000 !important;
+            }
+            #calendar-container > div > div, #calendar-body > div {
+                border: 1px solid #000 !important;
+                color: #000 !important;
+                background-color: #fff !important;
+            }
+            
+            /* Override backgrounds for clear printing */
+            .bg-blue-100 { 
+                background-color: #fff !important; 
+                border: 2px solid #000 !important;
+            }
+            
+            /* Ensure text is black for high contrast */
+            .text-blue-800, .text-gray-700, .text-teal-700, .text-gray-400, .font-bold {
+                color: #000 !important;
+            }
+            .border-gray-50 {
+                border-color: #ccc !important;
+            }
+            
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            /* Set print layout to landscape for better calendar fitting */
+            @page {
+                size: landscape;
+                margin: 1cm;
+            }
+        }
+
+        .print-header {
+            display: none;
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- App Header (Hidden on print, replaced by print-header) -->
+        <div class="no-print flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Protege Roster Automation</h1>
+                <p class="text-gray-500 mt-1">Manage and rotate weekly tasks fairly across your team.</p>
+            </div>
+            <button onclick="window.print()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg shadow transition-colors font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Print Roster
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            
+            <!-- Configuration Sidebar -->
+            <div class="no-print xl:col-span-1 space-y-6">
+                
+                <!-- Month Selection -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <h2 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                        </svg>
+                        Select Month
+                    </h2>
+                    <input type="month" id="month-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-medium">
+                </div>
+
+                <!-- Proteges Input Box -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <h2 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                        Proteges
+                    </h2>
+                    <div class="space-y-3" id="protege-inputs">
+                        <!-- Inputs generated dynamically -->
+                    </div>
+                    <button onclick="addProtege()" class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">+ Add Protege</button>
+                </div>
+
+                <!-- Tasks Input Box -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                    <h2 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z" clip-rule="evenodd" />
+                        </svg>
+                        Tasks
+                    </h2>
+                    <div class="space-y-3" id="task-inputs">
+                        <!-- Inputs generated dynamically -->
+                    </div>
+                    <button onclick="addTask()" class="mt-3 text-sm text-teal-600 hover:text-teal-800 font-medium flex items-center gap-1">+ Add Task</button>
+                </div>
+
+                <button onclick="generateRoster()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                    </svg>
+                    Generate Roster
+                </button>
+            </div>
+
+            <!-- Schedule Output Area -->
+            <div class="xl:col-span-3">
+                
+                <!-- Print Header (Only visible on printed paper) -->
+                <div class="print-header">
+                    <h1 class="text-2xl font-bold">Monthly Protege Task Roster</h1>
+                    <p class="text-gray-600" id="print-date"></p>
+                </div>
+
+                <div class="print-area-wrapper bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div id="calendar-container" class="w-full bg-white">
+                        <!-- Days of Week Header -->
+                        <div class="grid grid-cols-7 bg-gray-50 border-b-2 border-gray-300 text-center font-semibold text-gray-700 text-xs sm:text-sm">
+                            <div class="py-2 sm:py-3 border-r border-gray-200 text-red-600">Sun</div>
+                            <div class="py-2 sm:py-3 border-r border-gray-200">Mon</div>
+                            <div class="py-2 sm:py-3 border-r border-gray-200 text-blue-600">Tue</div>
+                            <div class="py-2 sm:py-3 border-r border-gray-200">Wed</div>
+                            <div class="py-2 sm:py-3 border-r border-gray-200">Thu</div>
+                            <div class="py-2 sm:py-3 border-r border-gray-200">Fri</div>
+                            <div class="py-2 sm:py-3 text-indigo-600">Sat</div>
+                        </div>
+                        <!-- Calendar Body -->
+                        <div id="calendar-body" class="grid grid-cols-7 bg-gray-200 gap-px">
+                            <!-- JS populated calendar cells -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="no-print mt-4 text-sm text-gray-500 bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    <p><strong>Rotation Rules:</strong> Tasks rotate chronologically per person. Tuesday includes a mandatory <strong>Site Inspection</strong> banner alongside regular tasks. Sunday is a <strong>Holiday</strong>. Saturday tasks continue the standard rotation loop seamlessly.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Override Modal -->
+    <div id="override-modal" class="no-print hidden fixed inset-0 bg-gray-900 bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4 text-gray-800" id="modal-title">Override Tasks</h2>
+            
+            <div class="space-y-4 mb-4">
+                <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                    <input type="checkbox" id="modal-holiday-cb" onchange="toggleModalInputs()" class="rounded text-red-600 focus:ring-red-500 w-4 h-4">
+                    <span>Mark as Holiday (No Tasks)</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                    <input type="checkbox" id="modal-sitevisit-cb" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4">
+                    <span>Include Site Inspection Banner</span>
+                </label>
+            </div>
+            
+            <div id="modal-assignments-wrapper" class="border-t pt-4 transition-opacity duration-200">
+                <h3 class="text-sm font-semibold text-gray-600 mb-2">Day Assignments</h3>
+                <div id="modal-assignments-container" class="space-y-2">
+                    <!-- assignment rows -->
+                </div>
+                <button onclick="addModalRow()" class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">+ Add Assignment</button>
+            </div>
+            
+            <div class="mt-8 flex justify-end gap-3 border-t pt-4">
+                <button onclick="closeModal()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium rounded-lg transition-colors">Cancel</button>
+                <button onclick="saveModal()" class="px-4 py-2 text-white bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg transition-colors shadow-sm">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addProtege(val = '') {
+            const container = document.getElementById('protege-inputs');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center';
+            div.innerHTML = `
+                <input type="text" class="protege-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" value="${val}" placeholder="Protege Name">
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 text-xl font-bold px-1" title="Remove">&times;</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function addTask(val = '') {
+            const container = document.getElementById('task-inputs');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center';
+            div.innerHTML = `
+                <input type="text" class="task-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm" value="${val}" placeholder="Task Description">
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 text-xl font-bold px-1" title="Remove">&times;</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // Global State Management
+        let rosterState = {};
+        let currentYear = null;
+        let currentMonth = null;
+        let currentStartDay = null;
+        let currentDaysInMonth = null;
+        let currentEditingDay = null;
+
+        function generateRoster() {
+            // 1. Gather Proteges dynamically
+            const proteges = [];
+            document.querySelectorAll('.protege-input').forEach(node => {
+                if (node.value.trim()) proteges.push(node.value.trim());
+            });
+            if (proteges.length === 0) proteges.push("Protege 1"); // Fallback
+
+            // 2. Gather Tasks dynamically
+            const tasks = [];
+            document.querySelectorAll('.task-input').forEach(node => {
+                if (node.value.trim()) tasks.push(node.value.trim());
+            });
+            // Fallback if no tasks entered
+            if (tasks.length === 0) tasks.push("General Duties");
+
+            // 3. Get Selected Month & Year
+            const monthVal = document.getElementById('month-select').value;
+            if (!monthVal) return;
+            const [yearStr, monthStr] = monthVal.split('-');
+            currentYear = parseInt(yearStr, 10);
+            currentMonth = parseInt(monthStr, 10) - 1; // 0-indexed for Date
+
+            // Update Print Header Date
+            const monthName = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
+            document.getElementById('print-date').textContent = "Generated for: " + monthName;
+
+            currentStartDay = new Date(currentYear, currentMonth, 1).getDay();
+            currentDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            // 4. Calculate Base State for the Month
+            rosterState = {};
+            let effectiveDayCounter = 0;
+
+            for(let d = 1; d <= currentDaysInMonth; d++) {
+                const dayOfWeek = new Date(currentYear, currentMonth, d).getDay();
+                let isHoliday = (dayOfWeek === 0);
+                let hasSiteInspection = (dayOfWeek === 2);
+                let assignments = [];
+
+                if (!isHoliday) {
+                    proteges.forEach((p, pIndex) => {
+                        const taskIndex = (pIndex + effectiveDayCounter) % tasks.length;
+                        assignments.push({ protege: p, task: tasks[taskIndex] });
+                    });
+                    effectiveDayCounter++; // Only increment rotation when it's not a Sunday
+                }
+                
+                rosterState[d] = { dayOfWeek, isHoliday, hasSiteInspection, assignments };
+            }
+
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const calBody = document.getElementById('calendar-body');
+            calBody.innerHTML = '';
+
+            // Build blank offset cells for start of month
+            for(let i = 0; i < currentStartDay; i++) {
+                calBody.innerHTML += `<div class="bg-gray-50 min-h-[100px] md:min-h-[120px]"></div>`;
+            }
+
+            // Generate the actual month days from the stored state
+            for(let d = 1; d <= currentDaysInMonth; d++) {
+                const dayData = rosterState[d];
+                
+                let cellHtml = `<div onclick="openModal(${d})" class="bg-white p-1 lg:p-2 min-h-[100px] md:min-h-[130px] flex flex-col transition-colors hover:bg-indigo-50 cursor-pointer relative group overflow-hidden border border-transparent hover:border-indigo-200">`;
+                cellHtml += `<div class="font-bold ${dayData.dayOfWeek === 0 ? 'text-red-400' : 'text-gray-400'} text-right text-xs md:text-sm mb-1">${d}</div>`;
+                cellHtml += `<div class="flex-1 flex flex-col gap-[1px]">`;
+
+                if (dayData.isHoliday) {
+                    cellHtml += `
+                    <div class="bg-red-50 text-red-600 text-[10px] md:text-xs font-bold py-2 px-1 rounded text-center uppercase tracking-wider my-auto border border-red-100 shadow-sm mx-1">
+                        Holiday<br><span class="font-medium text-[9px] md:text-[10px] normal-case">(Off Day)</span>
+                    </div>`;
+                } else {
+                    if (dayData.hasSiteInspection) { 
+                        cellHtml += `
+                        <div class="bg-blue-100 text-blue-800 text-[9px] md:text-[10px] font-bold py-1 px-1 rounded text-center uppercase tracking-wider mb-1 border border-blue-200 shadow-sm mx-1">
+                            Site Inspection
+                        </div>`;
+                    }
+                    
+                    dayData.assignments.forEach(a => {
+                        cellHtml += `
+                        <div class="text-[9px] md:text-[10px] xl:text-[11px] leading-tight flex justify-between items-center border-b border-gray-50 pb-[2px] mb-[1px]">
+                            <span class="font-semibold text-gray-700 truncate w-1/2 pr-1" title="${a.protege}">${a.protege}</span>
+                            <span class="text-teal-700 truncate w-1/2 text-right" title="${a.task}">${a.task}</span>
+                        </div>`;
+                    });
+                }
+                
+                // Hover overlay to indicate editability
+                cellHtml += `<div class="absolute inset-0 bg-indigo-500 bg-opacity-10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity no-print"><span class="bg-white text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-md shadow-sm">Edit Day ${d}</span></div>`;
+                cellHtml += `</div></div>`;
+                calBody.innerHTML += cellHtml;
+            }
+
+            // Fill the remaining grid to keep structure perfectly aligned
+            const totalCells = currentStartDay + currentDaysInMonth;
+            const remainder = totalCells % 7;
+            if (remainder !== 0) {
+                const padding = 7 - remainder;
+                for(let i = 0; i < padding; i++) {
+                    calBody.innerHTML += `<div class="bg-gray-50 min-h-[100px] md:min-h-[120px]"></div>`;
+                }
+            }
+        }
+
+        function openModal(day) {
+            currentEditingDay = day;
+            const dayData = rosterState[day];
+            document.getElementById('modal-title').innerText = `Override Tasks - Day ${day}`;
+            
+            document.getElementById('modal-holiday-cb').checked = dayData.isHoliday;
+            document.getElementById('modal-sitevisit-cb').checked = dayData.hasSiteInspection;
+
+            const container = document.getElementById('modal-assignments-container');
+            container.innerHTML = '';
+            
+            dayData.assignments.forEach(a => {
+                addModalRow(a.protege, a.task);
+            });
+            
+            toggleModalInputs();
+            document.getElementById('override-modal').classList.remove('hidden');
+        }
+
+        function toggleModalInputs() {
+            const isHoliday = document.getElementById('modal-holiday-cb').checked;
+            const wrapper = document.getElementById('modal-assignments-wrapper');
+            wrapper.style.opacity = isHoliday ? '0.4' : '1';
+            wrapper.style.pointerEvents = isHoliday ? 'none' : 'auto';
+        }
+
+        function addModalRow(protege = '', task = '') {
+            const container = document.getElementById('modal-assignments-container');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center modal-row';
+            div.innerHTML = `
+                <input type="text" class="modal-protege-input w-1/2 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500" value="${protege}" placeholder="Protege Name">
+                <input type="text" class="modal-task-input w-1/2 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-teal-500 focus:border-teal-500" value="${task}" placeholder="Assigned Task">
+                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 text-xl font-bold px-1" title="Remove">&times;</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function closeModal() {
+            document.getElementById('override-modal').classList.add('hidden');
+        }
+
+        function saveModal() {
+            const isHoliday = document.getElementById('modal-holiday-cb').checked;
+            const hasSiteInspection = document.getElementById('modal-sitevisit-cb').checked;
+            
+            let newAssignments = [];
+            if (!isHoliday) {
+                document.querySelectorAll('.modal-row').forEach(row => {
+                    const p = row.querySelector('.modal-protege-input').value.trim();
+                    const t = row.querySelector('.modal-task-input').value.trim();
+                    if (p || t) {
+                        newAssignments.push({ protege: p || 'Unassigned', task: t || 'No Task' });
+                    }
+                });
+            }
+
+            // Update Global State
+            rosterState[currentEditingDay].isHoliday = isHoliday;
+            rosterState[currentEditingDay].hasSiteInspection = hasSiteInspection;
+            rosterState[currentEditingDay].assignments = newAssignments;
+
+            closeModal();
+            renderCalendar(); // Redraw with overrides
+        }
+
+        // Auto-generate roster on page load with current month
+        window.onload = function() {
+            // Seed initial dynamic inputs
+            const initialProteges = ["Ahmad", "Sarah", "Jason", "Mei Ling", "Raju", "Aisyah"];
+            initialProteges.forEach(p => addProtege(p));
+            
+            const initialTasks = ["Admin / Filing", "Safety Briefing", "Report Writing", "Quality Check", "Data Entry", "Inventory Mgmt"];
+            initialTasks.forEach(t => addTask(t));
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            document.getElementById('month-select').value = `${year}-${month}`;
+            
+            generateRoster();
+        };
+    </script>
+</body>
+</html>
