@@ -46,15 +46,18 @@
             }
             
             /* Override backgrounds for clear printing */
-            .bg-blue-100 { 
-                background-color: #fff !important; 
-                border: 2px solid #000 !important;
-            }
-            
-            /* Ensure text is black for high contrast */
-            .text-blue-800, .text-gray-700, .text-teal-700, .text-gray-400, .font-bold {
-                color: #000 !important;
-            }
+.bg-blue-100, .bg-purple-100, .bg-pink-100, .bg-indigo-100, 
+.bg-orange-100, .bg-green-100, .bg-cyan-100, .bg-yellow-100, .bg-rose-100 { 
+    background-color: #fff !important; 
+    border: 2px solid #000 !important;
+}
+
+/* Ensure text is black for high contrast */
+.text-blue-800, .text-purple-800, .text-pink-800, .text-indigo-800, 
+.text-orange-800, .text-green-800, .text-cyan-800, .text-yellow-800, .text-rose-800,
+.text-gray-700, .text-teal-700, .text-gray-400, .font-bold {
+    color: #000 !important;
+}
             .border-gray-50 {
                 border-color: #ccc !important;
             }
@@ -190,15 +193,49 @@
         <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
             <h2 class="text-xl font-bold mb-4 text-gray-800" id="modal-title">Override Tasks</h2>
             
-            <div class="space-y-4 mb-4">
-                <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+            <div class="mb-4">
+                <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer mb-3">
                     <input type="checkbox" id="modal-holiday-cb" onchange="toggleModalInputs()" class="rounded text-red-600 focus:ring-red-500 w-4 h-4">
                     <span>Mark as Holiday (No Tasks)</span>
                 </label>
-                <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
-                    <input type="checkbox" id="modal-sitevisit-cb" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4">
-                    <span>Include Site Inspection Banner</span>
-                </label>
+                
+                <div class="h-px bg-gray-200 my-3"></div>
+                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Banners</h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="modal-sitevisit-cb" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4">
+                        <span>Site Inspection</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="modal-msm-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
+                        <span>Monthly Site Meeting</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="modal-mpm-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
+                        <span class="truncate">Monthly Progress Meeting No.27</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="modal-mcar-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
+                        <span>MCAR</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="modal-jsm-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
+                        <span>JSM</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="modal-spe-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
+                        <span>SPE/IPC (Upstream)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="modal-ipa24-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
+                        <span>IPA24</span>
+                    </label>
+                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
+                        <input type="checkbox" id="modal-ipa25-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
+                        <span>IPA25</span>
+                    </label>
+                </div>
             </div>
             
             <div id="modal-assignments-wrapper" class="border-t pt-4 transition-opacity duration-200">
@@ -222,15 +259,14 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Configuration & Initialization
-        // Firebase Configuration & Initialization
-const firebaseConfig = {
-  apiKey: "AIzaSyDOlwG1dt-qtFLF0noXMS8M3KC5bVWzeto",
-  authDomain: "protege-roster.firebaseapp.com",
-  projectId: "protege-roster",
-  storageBucket: "protege-roster.firebasestorage.app",
-  messagingSenderId: "707207597303",
-  appId: "1:707207597303:web:7548698b2f56376e0457f2"
-};
+        const firebaseConfig = {
+          apiKey: "AIzaSyDOlwG1dt-qtFLF0noXMS8M3KC5bVWzeto",
+          authDomain: "protege-roster.firebaseapp.com",
+          projectId: "protege-roster",
+          storageBucket: "protege-roster.firebasestorage.app",
+          messagingSenderId: "707207597303",
+          appId: "1:707207597303:web:7548698b2f56376e0457f2"
+        };
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'roster-automation-app';
         
@@ -338,6 +374,7 @@ const firebaseConfig = {
                 let isHoliday = (dayOfWeek === 0);
                 let hasSiteInspection = (dayOfWeek === 2);
                 let assignments = [];
+                let extraBanners = []; // Initialize empty array for extra banners
 
                 if (!isHoliday) {
                     proteges.forEach((p, pIndex) => {
@@ -347,7 +384,7 @@ const firebaseConfig = {
                     effectiveDayCounter++; 
                 }
                 
-                newRosterState[d] = { dayOfWeek, isHoliday, hasSiteInspection, assignments };
+                newRosterState[d] = { dayOfWeek, isHoliday, hasSiteInspection, assignments, extraBanners };
             }
 
             // Lock into global state & save to Firestore
@@ -396,6 +433,30 @@ const firebaseConfig = {
                         </div>`;
                     }
                     
+                    // Render extra custom banners
+                    // Render extra custom banners with unique colors
+if (dayData.extraBanners && dayData.extraBanners.length > 0) {
+    const bannerColors = {
+        "Monthly Site Meeting": "bg-pink-100 text-pink-800 border-pink-200",
+        "Monthly Progress Meeting No.27": "bg-indigo-100 text-indigo-800 border-indigo-200",
+        "MCAR": "bg-orange-100 text-orange-800 border-orange-200",
+        "JSM": "bg-green-100 text-green-800 border-green-200",
+        "SPE/IPC (Upstream)": "bg-cyan-100 text-cyan-800 border-cyan-200",
+        "IPA24": "bg-yellow-100 text-yellow-800 border-yellow-200",
+        "IPA25": "bg-rose-100 text-rose-800 border-rose-200"
+    };
+
+    dayData.extraBanners.forEach(banner => {
+        // Use the mapped colors, falling back to purple if not found
+        const colorClasses = bannerColors[banner] || "bg-purple-100 text-purple-800 border-purple-200";
+        
+        cellHtml += `
+        <div class="${colorClasses} text-[9px] md:text-[10px] font-bold py-1 px-1 rounded text-center uppercase tracking-wider mb-1 border shadow-sm mx-1">
+            ${banner}
+        </div>`;
+    });
+}
+                    
                     dayData.assignments.forEach(a => {
                         cellHtml += `
                         <div class="text-[9px] md:text-[10px] xl:text-[11px] leading-tight flex justify-between items-center border-b border-gray-50 pb-[2px] mb-[1px]">
@@ -428,13 +489,24 @@ const firebaseConfig = {
             
             document.getElementById('modal-holiday-cb').checked = dayData.isHoliday;
             document.getElementById('modal-sitevisit-cb').checked = dayData.hasSiteInspection;
+            
+            // Map the extra banners state to the checkboxes (using optional chaining for legacy data)
+            document.getElementById('modal-msm-cb').checked = dayData.extraBanners?.includes("Monthly Site Meeting") || false;
+            document.getElementById('modal-mpm-cb').checked = dayData.extraBanners?.includes("Monthly Progress Meeting No.27") || false;
+            document.getElementById('modal-mcar-cb').checked = dayData.extraBanners?.includes("MCAR") || false;
+            document.getElementById('modal-jsm-cb').checked = dayData.extraBanners?.includes("JSM") || false;
+            document.getElementById('modal-spe-cb').checked = dayData.extraBanners?.includes("SPE/IPC (Upstream)") || false;
+            document.getElementById('modal-ipa24-cb').checked = dayData.extraBanners?.includes("IPA24") || false;
+            document.getElementById('modal-ipa25-cb').checked = dayData.extraBanners?.includes("IPA25") || false;
 
             const container = document.getElementById('modal-assignments-container');
             container.innerHTML = '';
             
-            dayData.assignments.forEach(a => {
-                window.addModalRow(a.protege, a.task);
-            });
+            if (dayData.assignments) {
+                dayData.assignments.forEach(a => {
+                    window.addModalRow(a.protege, a.task);
+                });
+            }
             
             window.toggleModalInputs();
             document.getElementById('override-modal').classList.remove('hidden');
@@ -477,9 +549,20 @@ const firebaseConfig = {
                     }
                 });
             }
+            
+            // Gather all checked extra banners
+            let banners = [];
+            if (document.getElementById('modal-msm-cb').checked) banners.push("Monthly Site Meeting");
+            if (document.getElementById('modal-mpm-cb').checked) banners.push("Monthly Progress Meeting No.27");
+            if (document.getElementById('modal-mcar-cb').checked) banners.push("MCAR");
+            if (document.getElementById('modal-jsm-cb').checked) banners.push("JSM");
+            if (document.getElementById('modal-spe-cb').checked) banners.push("SPE/IPC (Upstream)");
+            if (document.getElementById('modal-ipa24-cb').checked) banners.push("IPA24");
+            if (document.getElementById('modal-ipa25-cb').checked) banners.push("IPA25");
 
             rosterState[currentEditingDay].isHoliday = isHoliday;
             rosterState[currentEditingDay].hasSiteInspection = hasSiteInspection;
+            rosterState[currentEditingDay].extraBanners = banners;
             rosterState[currentEditingDay].assignments = newAssignments;
 
             // Sync structural change upstream
