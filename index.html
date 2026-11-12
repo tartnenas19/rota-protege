@@ -11,90 +11,73 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background-color: #f8fafc;
         }
         
         /* Print-specific styling to hide UI elements and format the table perfectly for paper */
         @media print {
-            body {
-                background-color: #ffffff;
-                margin: 0;
-                padding: 0;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .print-area-wrapper {
-                width: 100%;
-                margin: 0;
-                padding: 0;
-                box-shadow: none !important;
-                border: none !important;
-            }
-            
-            /* Grid Print Enforcements for Calendar */
-            .grid {
-                display: grid !important;
-            }
-            #calendar-container {
-                border: 2px solid #000 !important;
-            }
-            #calendar-container > div > div, #calendar-body > div {
-                border: 1px solid #000 !important;
-                color: #000 !important;
-                background-color: #fff !important;
-            }
+            body { background-color: #ffffff; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            .print-area-wrapper { width: 100%; margin: 0; padding: 0; box-shadow: none !important; border: none !important; }
+            .grid { display: grid !important; }
+            #calendar-container { border: 2px solid #000 !important; }
+            #calendar-container > div > div, #calendar-body > div { border: 1px solid #000 !important; color: #000 !important; background-color: #fff !important; }
             
             /* Override backgrounds for clear printing */
-.bg-blue-100, .bg-purple-100, .bg-pink-100, .bg-indigo-100, 
-.bg-orange-100, .bg-green-100, .bg-cyan-100, .bg-yellow-100, .bg-rose-100 { 
-    background-color: #fff !important; 
-    border: 2px solid #000 !important;
-}
+            .bg-blue-100, .bg-purple-100, .bg-pink-100, .bg-indigo-100, 
+            .bg-orange-100, .bg-green-100, .bg-cyan-100, .bg-yellow-100, .bg-rose-100, .bg-teal-100 { 
+                background-color: #fff !important; 
+                border: 2px solid #000 !important;
+            }
 
-/* Ensure text is black for high contrast */
-.text-blue-800, .text-purple-800, .text-pink-800, .text-indigo-800, 
-.text-orange-800, .text-green-800, .text-cyan-800, .text-yellow-800, .text-rose-800,
-.text-gray-700, .text-teal-700, .text-gray-400, .font-bold {
-    color: #000 !important;
-}
-            .border-gray-50 {
-                border-color: #ccc !important;
+            /* Ensure text is black for high contrast */
+            .text-blue-800, .text-purple-800, .text-pink-800, .text-indigo-800, 
+            .text-orange-800, .text-green-800, .text-cyan-800, .text-yellow-800, .text-rose-800, .text-teal-800,
+            .text-gray-700, .text-teal-700, .text-gray-400, .font-bold {
+                color: #000 !important;
             }
-            
-            .print-header {
-                display: block !important;
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            /* Set print layout to landscape for better calendar fitting */
-            @page {
-                size: landscape;
-                margin: 1cm;
-            }
+            .border-gray-50 { border-color: #ccc !important; }
+            .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+            @page { size: landscape; margin: 1cm; }
         }
 
-        .print-header {
-            display: none;
-        }
+        .print-header { display: none; }
+        
+        /* Smooth animations for toast notifications */
+        .toast-enter { transform: translateY(100%); opacity: 0; }
+        .toast-enter-active { transform: translateY(0); opacity: 1; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .toast-exit { transform: translateY(0); opacity: 1; }
+        .toast-exit-active { transform: translateY(100%); opacity: 0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen p-4 md:p-8">
+<body class="text-slate-800 antialiased min-h-screen p-4 md:p-8">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="no-print fixed bottom-6 right-6 z-50 flex flex-col gap-3"></div>
 
     <div class="max-w-7xl mx-auto">
         
-        <!-- App Header (Hidden on print, replaced by print-header) -->
-        <div class="no-print flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <!-- App Header -->
+        <div class="no-print flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Protege Roster Automation</h1>
-                <p class="text-gray-500 mt-1">Manage and rotate weekly tasks fairly across your team.</p>
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Protege Roster Automation</h1>
+                <p class="text-slate-500 mt-1">Manage, rotate, and save weekly tasks across your team.</p>
             </div>
-            <button onclick="window.print()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-5 py-2.5 rounded-lg shadow transition-colors font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                Print Roster
-            </button>
+            <div class="flex flex-wrap items-center gap-3">
+                <button onclick="saveRoster()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg shadow-sm transition-colors font-semibold">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l7-7a1 1 0 00-1.414-1.414L10 12.586l-2.293-2.293z"/>
+                        <path d="M4 18a2 2 0 01-2-2V4a2 2 0 012-2h9.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V16a2 2 0 01-2 2H4z"/>
+                    </svg>
+                    Save Changes
+                </button>
+                <button onclick="window.print()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-lg shadow-sm border border-slate-300 transition-colors font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Print
+                </button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
@@ -102,86 +85,99 @@
             <!-- Configuration Sidebar -->
             <div class="no-print xl:col-span-1 space-y-6">
                 
-                <!-- Month Selection -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <svg class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
                           <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
                         </svg>
-                        Select Month
+                        Month Setup
                     </h2>
-                    <input type="month" id="month-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-medium">
+                    <input type="month" id="month-select" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-colors text-sm font-medium">
                 </div>
 
-                <!-- Proteges Input Box -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <svg class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
                           <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                         </svg>
                         Proteges
                     </h2>
-                    <div class="space-y-3" id="protege-inputs">
-                        <!-- Inputs generated dynamically -->
-                    </div>
-                    <button onclick="addProtege()" class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">+ Add Protege</button>
+                    <div class="space-y-3" id="protege-inputs"></div>
+                    <button onclick="addProtege()" class="mt-4 w-full py-2 border-2 border-dashed border-indigo-200 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg font-medium transition-colors flex items-center justify-center gap-1">+ Add Protege</button>
                 </div>
 
-                <!-- Tasks Input Box -->
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-500" viewBox="0 0 20 20" fill="currentColor">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <svg class="h-5 w-5 text-teal-500" viewBox="0 0 20 20" fill="currentColor">
                           <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z" clip-rule="evenodd" />
                         </svg>
                         Tasks
                     </h2>
-                    <div class="space-y-3" id="task-inputs">
-                        <!-- Inputs generated dynamically -->
-                    </div>
-                    <button onclick="addTask()" class="mt-3 text-sm text-teal-600 hover:text-teal-800 font-medium flex items-center gap-1">+ Add Task</button>
+                    <div class="space-y-3" id="task-inputs"></div>
+                    <button onclick="addTask()" class="mt-4 w-full py-2 border-2 border-dashed border-teal-200 text-sm text-teal-600 hover:bg-teal-50 rounded-lg font-medium transition-colors flex items-center justify-center gap-1">+ Add Task</button>
                 </div>
 
-                <button onclick="generateRoster()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <!-- UPDATED EVENT & ACRONYM SECTION -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-800 mb-4 border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <svg class="h-5 w-5 text-pink-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v7h-2l-1 2H8l-1-2H5V5z" clip-rule="evenodd" />
+                        </svg>
+                        Event Legend & Acronyms
+                    </h2>
+                    <div class="space-y-3" id="event-inputs"></div>
+                    <button onclick="addEvent()" class="mt-4 w-full py-2 border-2 border-dashed border-pink-200 text-sm text-pink-600 hover:bg-pink-50 rounded-lg font-medium transition-colors flex items-center justify-center gap-1">+ Add Acronym/Event</button>
+                </div>
+
+                <button onclick="generateRoster()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                     </svg>
-                    Generate Roster
+                    Preview New Roster
                 </button>
             </div>
 
             <!-- Schedule Output Area -->
             <div class="xl:col-span-3">
                 
-                <!-- Print Header (Only visible on printed paper) -->
+                <!-- Print Header -->
                 <div class="print-header">
                     <h1 class="text-2xl font-bold">Monthly Protege Task Roster</h1>
-                    <p class="text-gray-600" id="print-date"></p>
+                    <p class="text-slate-600" id="print-date"></p>
                 </div>
 
-                <div class="print-area-wrapper bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <!-- UPDATED DYNAMIC LEGEND AREA -->
+                <div class="no-print bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Event Legend & Acronyms</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-y-4 gap-x-4 text-xs text-slate-700 font-medium" id="legend-container">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <div class="print-area-wrapper bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div id="calendar-container" class="w-full bg-white">
                         <!-- Days of Week Header -->
-                        <div class="grid grid-cols-7 bg-gray-50 border-b-2 border-gray-300 text-center font-semibold text-gray-700 text-xs sm:text-sm">
-                            <div class="py-2 sm:py-3 border-r border-gray-200 text-red-600">Sun</div>
-                            <div class="py-2 sm:py-3 border-r border-gray-200">Mon</div>
-                            <div class="py-2 sm:py-3 border-r border-gray-200 text-blue-600">Tue</div>
-                            <div class="py-2 sm:py-3 border-r border-gray-200">Wed</div>
-                            <div class="py-2 sm:py-3 border-r border-gray-200">Thu</div>
-                            <div class="py-2 sm:py-3 border-r border-gray-200">Fri</div>
-                            <div class="py-2 sm:py-3 text-indigo-600">Sat</div>
+                        <div class="grid grid-cols-7 bg-slate-50 border-b border-slate-200 text-center font-bold text-slate-700 text-xs sm:text-sm uppercase tracking-wider">
+                            <div class="py-3 border-r border-slate-200 text-red-500">Sun</div>
+                            <div class="py-3 border-r border-slate-200">Mon</div>
+                            <div class="py-3 border-r border-slate-200 text-blue-600">Tue</div>
+                            <div class="py-3 border-r border-slate-200">Wed</div>
+                            <div class="py-3 border-r border-slate-200">Thu</div>
+                            <div class="py-3 border-r border-slate-200">Fri</div>
+                            <div class="py-3 text-indigo-600">Sat</div>
                         </div>
                         <!-- Calendar Body -->
-                        <div id="calendar-body" class="grid grid-cols-7 bg-gray-200 gap-px">
+                        <div id="calendar-body" class="grid grid-cols-7 bg-slate-200 gap-[1px]">
                             <!-- JS populated calendar cells -->
                         </div>
                     </div>
                 </div>
                 
-                <div class="no-print mt-4 text-sm text-gray-500 bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-start gap-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                <div class="no-print mt-6 text-sm text-slate-600 bg-slate-100/50 p-5 rounded-xl border border-slate-200 flex items-start gap-3">
+                    <svg class="h-5 w-5 text-slate-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                     </svg>
-                    <p><strong>Rotation Rules:</strong> Tasks rotate chronologically per person. Tuesday includes a mandatory <strong>Site Inspection</strong> banner alongside regular tasks. Sunday is a <strong>Holiday</strong>. Saturday tasks continue the standard rotation loop seamlessly.</p>
+                    <p><strong>Rotation Rules:</strong> Tasks rotate chronologically per person. Tuesday includes a mandatory <strong>Site Inspection</strong> banner. Sunday is a <strong>Holiday</strong>. Saturday tasks continue the standard rotation loop seamlessly.</p>
                 </div>
             </div>
 
@@ -189,66 +185,35 @@
     </div>
 
     <!-- Override Modal -->
-    <div id="override-modal" class="no-print hidden fixed inset-0 bg-gray-900 bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h2 class="text-xl font-bold mb-4 text-gray-800" id="modal-title">Override Tasks</h2>
+    <div id="override-modal" class="no-print hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 class="text-xl font-bold mb-4 text-slate-800" id="modal-title">Override Tasks</h2>
             
             <div class="mb-4">
-                <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer mb-3">
-                    <input type="checkbox" id="modal-holiday-cb" onchange="toggleModalInputs()" class="rounded text-red-600 focus:ring-red-500 w-4 h-4">
+                <label class="flex items-center space-x-2 text-sm font-medium text-slate-700 cursor-pointer mb-3">
+                    <input type="checkbox" id="modal-holiday-cb" onchange="toggleModalInputs()" class="rounded text-red-500 focus:ring-red-500 w-4 h-4 border-slate-300">
                     <span>Mark as Holiday (No Tasks)</span>
                 </label>
                 
-                <div class="h-px bg-gray-200 my-3"></div>
-                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Banners</h3>
+                <div class="h-px bg-slate-100 my-4"></div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Event Banners</h3>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
-                        <input type="checkbox" id="modal-sitevisit-cb" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4">
-                        <span>Site Inspection</span>
-                    </label>
-                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
-                        <input type="checkbox" id="modal-msm-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
-                        <span>Monthly Site Meeting</span>
-                    </label>
-                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
-                        <input type="checkbox" id="modal-mpm-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
-                        <span class="truncate">Monthly Progress Meeting No.27</span>
-                    </label>
-                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
-                        <input type="checkbox" id="modal-mcar-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
-                        <span>MCAR</span>
-                    </label>
-                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
-                        <input type="checkbox" id="modal-jsm-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
-                        <span>JSM</span>
-                    </label>
-                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
-                        <input type="checkbox" id="modal-spe-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
-                        <span>SPE/IPC (Upstream)</span>
-                    </label>
-                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
-                        <input type="checkbox" id="modal-ipa24-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
-                        <span>IPA24</span>
-                    </label>
-                    <label class="flex items-center space-x-2 text-sm font-medium text-gray-700 cursor-pointer">
-                        <input type="checkbox" id="modal-ipa25-cb" class="rounded text-purple-600 focus:ring-purple-500 w-4 h-4">
-                        <span>IPA25</span>
-                    </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="modal-dynamic-banners">
+                    <!-- Checkboxes injected dynamically based on user legend -->
                 </div>
             </div>
             
-            <div id="modal-assignments-wrapper" class="border-t pt-4 transition-opacity duration-200">
-                <h3 class="text-sm font-semibold text-gray-600 mb-2">Day Assignments</h3>
+            <div id="modal-assignments-wrapper" class="border-t border-slate-100 pt-4 mt-4 transition-opacity duration-200">
+                <h3 class="text-sm font-bold text-slate-700 mb-3">Day Assignments</h3>
                 <div id="modal-assignments-container" class="space-y-2">
                     <!-- assignment rows -->
                 </div>
                 <button onclick="addModalRow()" class="mt-3 text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">+ Add Assignment</button>
             </div>
             
-            <div class="mt-8 flex justify-end gap-3 border-t pt-4">
-                <button onclick="closeModal()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium rounded-lg transition-colors">Cancel</button>
-                <button onclick="saveModal()" class="px-4 py-2 text-white bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg transition-colors shadow-sm">Save Changes</button>
+            <div class="mt-8 flex justify-end gap-3 border-t border-slate-100 pt-5">
+                <button onclick="closeModal()" class="px-5 py-2.5 text-slate-600 bg-slate-100 hover:bg-slate-200 font-semibold rounded-lg transition-colors">Cancel</button>
+                <button onclick="saveModal()" class="px-5 py-2.5 text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg transition-colors shadow-sm">Apply Override</button>
             </div>
         </div>
     </div>
@@ -258,7 +223,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration & Initialization
         const firebaseConfig = {
           apiKey: "AIzaSyDOlwG1dt-qtFLF0noXMS8M3KC5bVWzeto",
           authDomain: "protege-roster.firebaseapp.com",
@@ -269,58 +233,108 @@
         };
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'roster-automation-app';
-        
         let app, db, auth, dbRef, user = null;
         
         if (firebaseConfig) {
             app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
-            // Public path for sharing with office mates
             dbRef = doc(db, 'artifacts', appId, 'public', 'data', 'rosterData', 'sharedState');
         }
 
-        // Global State Management
         let rosterState = {};
         let currentProteges = [];
         let currentTasks = [];
+        let currentEvents = []; 
+        
         let currentYear = null;
         let currentMonth = null;
         let currentStartDay = null;
         let currentDaysInMonth = null;
         let currentEditingDay = null;
 
-        // Ensure JS built-in dates accurately capture days in month including leap years
+        // Color Maps dictionary ensures dynamic tailwind classes load safely
+        const colorMaps = {
+            'pink': { full: 'bg-pink-100 text-pink-800 border-pink-200', dot: 'bg-pink-100 border-pink-200' },
+            'indigo': { full: 'bg-indigo-100 text-indigo-800 border-indigo-200', dot: 'bg-indigo-100 border-indigo-200' },
+            'orange': { full: 'bg-orange-100 text-orange-800 border-orange-200', dot: 'bg-orange-100 border-orange-200' },
+            'green': { full: 'bg-green-100 text-green-800 border-green-200', dot: 'bg-green-100 border-green-200' },
+            'cyan': { full: 'bg-cyan-100 text-cyan-800 border-cyan-200', dot: 'bg-cyan-100 border-cyan-200' },
+            'yellow': { full: 'bg-yellow-100 text-yellow-800 border-yellow-200', dot: 'bg-yellow-100 border-yellow-200' },
+            'rose': { full: 'bg-rose-100 text-rose-800 border-rose-200', dot: 'bg-rose-100 border-rose-200' },
+            'purple': { full: 'bg-purple-100 text-purple-800 border-purple-200', dot: 'bg-purple-100 border-purple-200' },
+            'teal': { full: 'bg-teal-100 text-teal-800 border-teal-200', dot: 'bg-teal-100 border-teal-200' }
+        };
+
+        window.showToast = function(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-emerald-600' : 'bg-blue-600';
+            toast.className = `toast-enter flex items-center justify-between gap-4 p-4 rounded-xl shadow-lg text-white ${bgColor}`;
+            toast.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span class="font-medium text-sm">${message}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white">&times;</button>
+            `;
+            container.appendChild(toast);
+            
+            requestAnimationFrame(() => {
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-enter-active');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                toast.classList.remove('toast-enter-active');
+                requestAnimationFrame(() => toast.classList.add('toast-exit-active'));
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
         function updateCalendarVars(monthVal) {
             const [yearStr, monthStr] = monthVal.split('-');
             currentYear = parseInt(yearStr, 10);
-            currentMonth = parseInt(monthStr, 10) - 1; // 0-indexed for Date
+            currentMonth = parseInt(monthStr, 10) - 1; 
 
             const monthName = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
             document.getElementById('print-date').textContent = "Generated for: " + monthName;
 
             currentStartDay = new Date(currentYear, currentMonth, 1).getDay();
-            // Using day '0' of the *next* month rigorously fetches the exact last day of the current month
             currentDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         }
 
-        async function saveStateToDB(data) {
-            if (!user || !dbRef) return;
+        window.saveRoster = async function() {
+            if (!user || !dbRef) {
+                showToast("Cannot save: Not connected to database", "error");
+                return;
+            }
+            const monthVal = document.getElementById('month-select').value;
             try {
-                await setDoc(dbRef, data);
+                await setDoc(dbRef, {
+                    proteges: currentProteges,
+                    tasks: currentTasks,
+                    events: currentEvents,
+                    selectedMonth: monthVal,
+                    rosterState: rosterState
+                });
+                showToast("Roster saved successfully!", "success");
             } catch (e) {
                 console.error("Firestore Save error:", e);
+                showToast("Error saving roster.", "error");
             }
-        }
+        };
 
-        // Exposed globally for inline HTML event handlers
         window.addProtege = function(val = '') {
             const container = document.getElementById('protege-inputs');
             const div = document.createElement('div');
             div.className = 'flex gap-2 items-center';
             div.innerHTML = `
-                <input type="text" class="protege-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" value="${val}" placeholder="Protege Name">
-                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 text-xl font-bold px-1" title="Remove">&times;</button>
+                <input type="text" class="protege-input w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-sm transition-colors" value="${val}" placeholder="Protege Name">
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-red-500 text-xl font-bold px-2 transition-colors">&times;</button>
             `;
             container.appendChild(div);
         };
@@ -330,8 +344,31 @@
             const div = document.createElement('div');
             div.className = 'flex gap-2 items-center';
             div.innerHTML = `
-                <input type="text" class="task-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-sm" value="${val}" placeholder="Task Description">
-                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 text-xl font-bold px-1" title="Remove">&times;</button>
+                <input type="text" class="task-input w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white text-sm transition-colors" value="${val}" placeholder="Task Description">
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-red-500 text-xl font-bold px-2 transition-colors">&times;</button>
+            `;
+            container.appendChild(div);
+        };
+
+        // UPDATED: Now supports acronym + full description in the editor
+        window.addEvent = function(val = '', desc = '', color = 'purple') {
+            const container = document.getElementById('event-inputs');
+            const div = document.createElement('div');
+            div.className = 'bg-slate-50 border border-slate-200 p-3 rounded-lg flex flex-col gap-2 event-row';
+            
+            let colorOptions = Object.keys(colorMaps).map(c => 
+                `<option value="${c}" ${c === color ? 'selected' : ''}>${c.charAt(0).toUpperCase() + c.slice(1)}</option>`
+            ).join('');
+            
+            div.innerHTML = `
+                <div class="flex gap-2">
+                    <input type="text" class="event-input flex-1 px-3 py-2 bg-white border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm transition-colors" value="${val}" placeholder="Acronym (e.g. JSM)">
+                    <select class="event-color w-1/3 px-2 py-2 bg-white border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm transition-colors cursor-pointer">
+                        ${colorOptions}
+                    </select>
+                    <button onclick="this.closest('.event-row').remove()" class="text-slate-400 hover:text-red-500 text-xl font-bold px-1 transition-colors">&times;</button>
+                </div>
+                <input type="text" class="event-desc w-full px-3 py-2 bg-white border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm transition-colors" value="${desc}" placeholder="Full Description">
             `;
             container.appendChild(div);
         };
@@ -346,8 +383,28 @@
             list.forEach(t => window.addTask(t));
         }
 
+        function renderEvents(list) {
+            document.getElementById('event-inputs').innerHTML = '';
+            list.forEach(e => window.addEvent(e.name, e.desc || '', e.color));
+        }
+
+        // UPDATED: Renders BOTH the Acronym and the Description in the legend cleanly
+        function renderLegend() {
+            const container = document.getElementById('legend-container');
+            
+            // Standard built-in legend items
+            let html = `<div class="col-span-full md:col-span-1 flex items-start gap-2"><span class="w-3.5 h-3.5 mt-0.5 rounded bg-blue-100 border border-blue-200 shadow-sm flex-shrink-0"></span> <span class="text-xs leading-tight"><strong>Site Insp.</strong><br><span class="text-slate-500">Site Inspection</span></span></div>`;
+            
+            currentEvents.forEach(e => {
+                const styles = colorMaps[e.color] || colorMaps['purple'];
+                html += `<div class="col-span-full md:col-span-1 flex items-start gap-2"><span class="w-3.5 h-3.5 mt-0.5 rounded ${styles.dot} shadow-sm flex-shrink-0"></span> <span class="text-xs leading-tight"><strong>${e.name}</strong><br><span class="text-slate-500">${e.desc || ''}</span></span></div>`;
+            });
+            
+            html += `<div class="col-span-full md:col-span-1 flex items-start gap-2"><span class="w-3.5 h-3.5 mt-0.5 rounded bg-red-50 border border-red-200 shadow-sm flex-shrink-0"></span> <span class="text-xs leading-tight"><strong>Holiday</strong><br><span class="text-slate-500">Standard Off Day</span></span></div>`;
+            container.innerHTML = html;
+        }
+
         window.generateRoster = function() {
-            // Gather active UI inputs
             const proteges = [];
             document.querySelectorAll('.protege-input').forEach(node => {
                 if (node.value.trim()) proteges.push(node.value.trim());
@@ -360,12 +417,19 @@
             });
             if (tasks.length === 0) tasks.push("General Duties");
 
+            const events = [];
+            document.querySelectorAll('.event-row').forEach(node => {
+                const name = node.querySelector('.event-input').value.trim();
+                const desc = node.querySelector('.event-desc').value.trim();
+                const color = node.querySelector('.event-color').value;
+                if (name) events.push({ name, desc, color });
+            });
+
             const monthVal = document.getElementById('month-select').value;
             if (!monthVal) return;
 
             updateCalendarVars(monthVal);
 
-            // Compute structural daily state across the exact true number of days
             const newRosterState = {};
             let effectiveDayCounter = 0;
 
@@ -374,7 +438,7 @@
                 let isHoliday = (dayOfWeek === 0);
                 let hasSiteInspection = (dayOfWeek === 2);
                 let assignments = [];
-                let extraBanners = []; // Initialize empty array for extra banners
+                let extraBanners = []; 
 
                 if (!isHoliday) {
                     proteges.forEach((p, pIndex) => {
@@ -383,101 +447,80 @@
                     });
                     effectiveDayCounter++; 
                 }
-                
                 newRosterState[d] = { dayOfWeek, isHoliday, hasSiteInspection, assignments, extraBanners };
             }
 
-            // Lock into global state & save to Firestore
             currentProteges = proteges;
             currentTasks = tasks;
+            currentEvents = events;
             rosterState = newRosterState;
             
-            saveStateToDB({
-                proteges: currentProteges,
-                tasks: currentTasks,
-                selectedMonth: monthVal,
-                rosterState: rosterState
-            });
-
+            renderLegend();
             renderCalendar();
+            showToast("Preview generated. Click 'Save Changes' to apply globally.", "info");
         };
 
         function renderCalendar() {
             const calBody = document.getElementById('calendar-body');
             calBody.innerHTML = '';
 
-            // Build blank offset cells for start of month
             for(let i = 0; i < currentStartDay; i++) {
-                calBody.innerHTML += `<div class="bg-gray-50 min-h-[100px] md:min-h-[120px]"></div>`;
+                calBody.innerHTML += `<div class="bg-slate-50/50 min-h-[100px] md:min-h-[130px]"></div>`;
             }
 
-            // Generate precise month days strictly capped by 'currentDaysInMonth'
             for(let d = 1; d <= currentDaysInMonth; d++) {
                 const dayData = rosterState[d];
                 if (!dayData) continue;
                 
-                let cellHtml = `<div onclick="openModal(${d})" class="bg-white p-1 lg:p-2 min-h-[100px] md:min-h-[130px] flex flex-col transition-colors hover:bg-indigo-50 cursor-pointer relative group overflow-hidden border border-transparent hover:border-indigo-200">`;
-                cellHtml += `<div class="font-bold ${dayData.dayOfWeek === 0 ? 'text-red-400' : 'text-gray-400'} text-right text-xs md:text-sm mb-1">${d}</div>`;
-                cellHtml += `<div class="flex-1 flex flex-col gap-[1px]">`;
+                let cellHtml = `<div onclick="openModal(${d})" class="bg-white p-2 min-h-[100px] md:min-h-[140px] flex flex-col transition-all hover:bg-slate-50 cursor-pointer relative group overflow-hidden border-2 border-transparent hover:border-indigo-100">`;
+                cellHtml += `<div class="font-bold ${dayData.dayOfWeek === 0 ? 'text-red-400' : 'text-slate-400'} text-right text-xs md:text-sm mb-1">${d}</div>`;
+                cellHtml += `<div class="flex-1 flex flex-col gap-1">`;
 
                 if (dayData.isHoliday) {
                     cellHtml += `
-                    <div class="bg-red-50 text-red-600 text-[10px] md:text-xs font-bold py-2 px-1 rounded text-center uppercase tracking-wider my-auto border border-red-100 shadow-sm mx-1">
-                        Holiday<br><span class="font-medium text-[9px] md:text-[10px] normal-case">(Off Day)</span>
+                    <div class="bg-red-50 text-red-600 text-[10px] md:text-xs font-bold py-2 px-1 rounded-md text-center uppercase tracking-wider my-auto border border-red-100 shadow-sm">
+                        Holiday<br><span class="font-medium text-[9px] md:text-[10px] normal-case opacity-80">(Off Day)</span>
                     </div>`;
                 } else {
                     if (dayData.hasSiteInspection) { 
                         cellHtml += `
-                        <div class="bg-blue-100 text-blue-800 text-[9px] md:text-[10px] font-bold py-1 px-1 rounded text-center uppercase tracking-wider mb-1 border border-blue-200 shadow-sm mx-1">
-                            Site Inspection
+                        <div class="bg-blue-100 text-blue-800 text-[9px] md:text-[10px] font-bold py-1 px-1 rounded flex items-center justify-center uppercase tracking-wider border border-blue-200 shadow-sm">
+                            Site Insp.
                         </div>`;
                     }
                     
-                    // Render extra custom banners
-                    // Render extra custom banners with unique colors
-if (dayData.extraBanners && dayData.extraBanners.length > 0) {
-    const bannerColors = {
-        "Monthly Site Meeting": "bg-pink-100 text-pink-800 border-pink-200",
-        "Monthly Progress Meeting No.27": "bg-indigo-100 text-indigo-800 border-indigo-200",
-        "MCAR": "bg-orange-100 text-orange-800 border-orange-200",
-        "JSM": "bg-green-100 text-green-800 border-green-200",
-        "SPE/IPC (Upstream)": "bg-cyan-100 text-cyan-800 border-cyan-200",
-        "IPA24": "bg-yellow-100 text-yellow-800 border-yellow-200",
-        "IPA25": "bg-rose-100 text-rose-800 border-rose-200"
-    };
-
-    dayData.extraBanners.forEach(banner => {
-        // Use the mapped colors, falling back to purple if not found
-        const colorClasses = bannerColors[banner] || "bg-purple-100 text-purple-800 border-purple-200";
-        
-        cellHtml += `
-        <div class="${colorClasses} text-[9px] md:text-[10px] font-bold py-1 px-1 rounded text-center uppercase tracking-wider mb-1 border shadow-sm mx-1">
-            ${banner}
-        </div>`;
-    });
-}
+                    if (dayData.extraBanners && dayData.extraBanners.length > 0) {
+                        dayData.extraBanners.forEach(bannerName => {
+                            const evDef = currentEvents.find(e => e.name === bannerName);
+                            const styles = evDef && colorMaps[evDef.color] ? colorMaps[evDef.color].full : colorMaps['purple'].full;
+                            
+                            cellHtml += `
+                            <div class="${styles} text-[9px] md:text-[10px] font-bold py-1 px-1 rounded text-center uppercase tracking-wider border shadow-sm">
+                                ${bannerName}
+                            </div>`;
+                        });
+                    }
                     
                     dayData.assignments.forEach(a => {
                         cellHtml += `
-                        <div class="text-[9px] md:text-[10px] xl:text-[11px] leading-tight flex justify-between items-center border-b border-gray-50 pb-[2px] mb-[1px]">
-                            <span class="font-semibold text-gray-700 truncate w-1/2 pr-1" title="${a.protege}">${a.protege}</span>
-                            <span class="text-teal-700 truncate w-1/2 text-right" title="${a.task}">${a.task}</span>
+                        <div class="text-[9px] md:text-[10px] xl:text-[11px] leading-tight flex justify-between items-center border-b border-slate-100 pb-1 mt-0.5">
+                            <span class="font-semibold text-slate-700 truncate w-[45%]" title="${a.protege}">${a.protege}</span>
+                            <span class="text-teal-600 font-medium truncate w-[50%] text-right" title="${a.task}">${a.task}</span>
                         </div>`;
                     });
                 }
                 
-                cellHtml += `<div class="absolute inset-0 bg-indigo-500 bg-opacity-10 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity no-print"><span class="bg-white text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-md shadow-sm">Edit Day ${d}</span></div>`;
+                cellHtml += `<div class="absolute inset-0 bg-slate-900/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity no-print"><span class="bg-white/95 text-indigo-600 text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm border border-indigo-100 backdrop-blur-sm">Edit Day ${d}</span></div>`;
                 cellHtml += `</div></div>`;
                 calBody.innerHTML += cellHtml;
             }
 
-            // Fill remainder to align the 7-day grid seamlessly
             const totalCells = currentStartDay + currentDaysInMonth;
             const remainder = totalCells % 7;
             if (remainder !== 0) {
                 const padding = 7 - remainder;
                 for(let i = 0; i < padding; i++) {
-                    calBody.innerHTML += `<div class="bg-gray-50 min-h-[100px] md:min-h-[120px]"></div>`;
+                    calBody.innerHTML += `<div class="bg-slate-50/50 min-h-[100px] md:min-h-[130px]"></div>`;
                 }
             }
         }
@@ -488,16 +531,27 @@ if (dayData.extraBanners && dayData.extraBanners.length > 0) {
             document.getElementById('modal-title').innerText = `Override Tasks - Day ${day}`;
             
             document.getElementById('modal-holiday-cb').checked = dayData.isHoliday;
-            document.getElementById('modal-sitevisit-cb').checked = dayData.hasSiteInspection;
             
-            // Map the extra banners state to the checkboxes (using optional chaining for legacy data)
-            document.getElementById('modal-msm-cb').checked = dayData.extraBanners?.includes("Monthly Site Meeting") || false;
-            document.getElementById('modal-mpm-cb').checked = dayData.extraBanners?.includes("Monthly Progress Meeting No.27") || false;
-            document.getElementById('modal-mcar-cb').checked = dayData.extraBanners?.includes("MCAR") || false;
-            document.getElementById('modal-jsm-cb').checked = dayData.extraBanners?.includes("JSM") || false;
-            document.getElementById('modal-spe-cb').checked = dayData.extraBanners?.includes("SPE/IPC (Upstream)") || false;
-            document.getElementById('modal-ipa24-cb').checked = dayData.extraBanners?.includes("IPA24") || false;
-            document.getElementById('modal-ipa25-cb').checked = dayData.extraBanners?.includes("IPA25") || false;
+            // Build the modal checkboxes dynamically
+            const modalBannerContainer = document.getElementById('modal-dynamic-banners');
+            modalBannerContainer.innerHTML = `
+                <label class="flex items-center space-x-2 text-sm font-medium text-slate-700 cursor-pointer">
+                    <input type="checkbox" id="modal-sitevisit-cb" class="rounded text-blue-500 focus:ring-blue-500 w-4 h-4 border-slate-300">
+                    <span>Site Inspection</span>
+                </label>
+            `;
+            
+            currentEvents.forEach(ev => {
+                const isChecked = dayData.extraBanners?.includes(ev.name) ? 'checked' : '';
+                modalBannerContainer.innerHTML += `
+                    <label class="flex items-center space-x-2 text-sm font-medium text-slate-700 cursor-pointer">
+                        <input type="checkbox" value="${ev.name}" class="dynamic-banner-cb rounded text-indigo-500 focus:ring-indigo-500 w-4 h-4 border-slate-300" ${isChecked}>
+                        <span class="truncate" title="${ev.desc || ev.name}">${ev.name}</span>
+                    </label>
+                `;
+            });
+
+            document.getElementById('modal-sitevisit-cb').checked = dayData.hasSiteInspection;
 
             const container = document.getElementById('modal-assignments-container');
             container.innerHTML = '';
@@ -524,9 +578,9 @@ if (dayData.extraBanners && dayData.extraBanners.length > 0) {
             const div = document.createElement('div');
             div.className = 'flex gap-2 items-center modal-row';
             div.innerHTML = `
-                <input type="text" class="modal-protege-input w-1/2 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500" value="${protege}" placeholder="Protege Name">
-                <input type="text" class="modal-task-input w-1/2 px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-teal-500 focus:border-teal-500" value="${task}" placeholder="Assigned Task">
-                <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-600 text-xl font-bold px-1" title="Remove">&times;</button>
+                <input type="text" class="modal-protege-input w-1/2 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-indigo-500 focus:border-indigo-500" value="${protege}" placeholder="Protege Name">
+                <input type="text" class="modal-task-input w-1/2 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-teal-500 focus:border-teal-500" value="${task}" placeholder="Assigned Task">
+                <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-red-500 text-xl font-bold px-1">&times;</button>
             `;
             container.appendChild(div);
         };
@@ -550,36 +604,35 @@ if (dayData.extraBanners && dayData.extraBanners.length > 0) {
                 });
             }
             
-            // Gather all checked extra banners
             let banners = [];
-            if (document.getElementById('modal-msm-cb').checked) banners.push("Monthly Site Meeting");
-            if (document.getElementById('modal-mpm-cb').checked) banners.push("Monthly Progress Meeting No.27");
-            if (document.getElementById('modal-mcar-cb').checked) banners.push("MCAR");
-            if (document.getElementById('modal-jsm-cb').checked) banners.push("JSM");
-            if (document.getElementById('modal-spe-cb').checked) banners.push("SPE/IPC (Upstream)");
-            if (document.getElementById('modal-ipa24-cb').checked) banners.push("IPA24");
-            if (document.getElementById('modal-ipa25-cb').checked) banners.push("IPA25");
+            document.querySelectorAll('.dynamic-banner-cb').forEach(cb => {
+                if (cb.checked) banners.push(cb.value);
+            });
 
             rosterState[currentEditingDay].isHoliday = isHoliday;
             rosterState[currentEditingDay].hasSiteInspection = hasSiteInspection;
             rosterState[currentEditingDay].extraBanners = banners;
             rosterState[currentEditingDay].assignments = newAssignments;
 
-            // Sync structural change upstream
-            saveStateToDB({
-                proteges: currentProteges,
-                tasks: currentTasks,
-                selectedMonth: document.getElementById('month-select').value,
-                rosterState: rosterState
-            });
-
+            renderCalendar();
+            showToast("Override applied locally. Click 'Save Changes' to update database.", "info");
             window.closeModal();
-            renderCalendar(); 
         };
 
         function initDefaultState() {
             currentProteges = ["Ahmad", "Sarah", "Jason", "Mei Ling", "Raju", "Aisyah"];
             currentTasks = ["Admin / Filing", "Safety Briefing", "Report Writing", "Quality Check", "Data Entry", "Inventory Mgmt"];
+            
+            // Updated default setup with Acronyms and Descriptions
+            currentEvents = [
+                { name: "MSM", desc: "Monthly Site Meeting", color: "pink" },
+                { name: "MPM27", desc: "Monthly Progress Meeting No.27", color: "indigo" },
+                { name: "MCAR", desc: "Material Corrective Action Report", color: "orange" },
+                { name: "JSM", desc: "Job Safety Meeting", color: "green" },
+                { name: "SPE", desc: "SPE/IPC (Upstream)", color: "cyan" },
+                { name: "IPA24", desc: "Inspection Point A24", color: "yellow" },
+                { name: "IPA25", desc: "Inspection Point A25", color: "rose" }
+            ];
             
             const now = new Date();
             const year = now.getFullYear();
@@ -588,18 +641,17 @@ if (dayData.extraBanners && dayData.extraBanners.length > 0) {
             
             renderProteges(currentProteges);
             renderTasks(currentTasks);
-            window.generateRoster();
+            renderEvents(currentEvents);
+            window.generateRoster(); 
         }
 
-        // Firebase Auth & Data Connection
         async function initializeAppConnection() {
             if (!firebaseConfig) {
-                initDefaultState(); // Fallback for local testing
+                initDefaultState();
                 return;
             }
 
             try {
-                // Rule 3 Strict Enforcement: Authenticate prior to DB interaction
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
                     user = userCredential.user;
@@ -616,6 +668,22 @@ if (dayData.extraBanners && dayData.extraBanners.length > 0) {
                             rosterState = data.rosterState || {};
                             currentProteges = data.proteges || [];
                             currentTasks = data.tasks || [];
+                            
+                            // Load events with fallback logic for old missing records
+                            if (data.events && data.events.length > 0) {
+                                currentEvents = data.events;
+                            } else {
+                                currentEvents = [
+                                    { name: "MSM", desc: "Monthly Site Meeting", color: "pink" },
+                                    { name: "MPM27", desc: "Monthly Progress Meeting No.27", color: "indigo" },
+                                    { name: "MCAR", desc: "Material Corrective Action Report", color: "orange" },
+                                    { name: "JSM", desc: "Job Safety Meeting", color: "green" },
+                                    { name: "SPE", desc: "SPE/IPC (Upstream)", color: "cyan" },
+                                    { name: "IPA24", desc: "Inspection Point A24", color: "yellow" },
+                                    { name: "IPA25", desc: "Inspection Point A25", color: "rose" }
+                                ];
+                            }
+                            
                             const dbMonth = data.selectedMonth || "";
 
                             if (dbMonth) {
@@ -625,29 +693,27 @@ if (dayData.extraBanners && dayData.extraBanners.length > 0) {
                             
                             renderProteges(currentProteges);
                             renderTasks(currentTasks);
+                            renderEvents(currentEvents);
+                            renderLegend();
 
                             if (Object.keys(rosterState).length > 0) {
                                 renderCalendar();
                             }
                         } else if (isInitialLoad) {
-                            // Seed Database on first load if missing
                             initDefaultState();
                         }
                         isInitialLoad = false;
                     }, (error) => {
-                        console.error("Firestore sync error:", error);
+                        console.error("Firestore Listen Error:", error);
                     });
                 }
             } catch (error) {
-                console.error("Authentication failed:", error);
+                console.error("Authentication Error:", error);
                 initDefaultState();
             }
         }
 
-        // Boot Application
-        window.onload = function() {
-            initializeAppConnection();
-        };
+        initializeAppConnection();
     </script>
 </body>
 </html>
